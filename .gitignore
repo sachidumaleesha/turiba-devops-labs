@@ -1,0 +1,11 @@
+# Dependencies are installed from package-lock.json, never committed
+node_modules/
+
+# Local settings and secrets
+.env
+.env.*
+!.env.example
+
+# Logs and exported images
+npm-debug.log*
+*.tar

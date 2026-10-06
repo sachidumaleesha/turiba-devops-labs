@@ -239,7 +239,7 @@ In your clone of the course repository, create a folder `lab1/` with two files. 
 
 ```dockerfile
 FROM nginx:stable-alpine
-LABEL org.opencontainers.image.source="https://github.com/<you>/course-app"
+LABEL org.opencontainers.image.source="https://github.com/<you>/turiba-devops-labs"
 LABEL org.opencontainers.image.description="Lab 1 static page by Your Name"
 COPY index.html /usr/share/nginx/html/index.html
 EXPOSE 80

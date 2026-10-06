@@ -1,0 +1,3 @@
+# Keep LF line endings in every clone, on every OS. Files that run inside Linux
+# containers (shell scripts, entrypoints) break with Windows CRLF line endings.
+* text=auto eol=lf
