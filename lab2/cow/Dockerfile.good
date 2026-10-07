@@ -1,0 +1,2 @@
+FROM alpine:3.24
+RUN dd if=/dev/zero of=/big.file bs=1M count=50 && rm /big.file
