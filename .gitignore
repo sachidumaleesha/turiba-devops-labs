@@ -9,3 +9,11 @@ node_modules/
 # Logs and exported images
 npm-debug.log*
 *.tar
+
+# Editors and operating systems
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+
+# Test output
+coverage/
