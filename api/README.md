@@ -16,6 +16,7 @@ A small REST API for todos, written in Node.js (Express) with PostgreSQL. It is 
 | Method and path | Does |
 |-----------------|------|
 | `GET /` | Name and version: `{"name":"course-api","version":"0.1.0"}` |
+| `GET /healthz` | Health check: `{"status":"ok"}` while the process runs. Doesn't touch the database (Lab 2) |
 | `GET /api/todos` | All todos |
 | `POST /api/todos` | Create one: `{"title":"Buy milk"}` → `201` |
 | `PATCH /api/todos/:id` | Change `title` and/or `done` |

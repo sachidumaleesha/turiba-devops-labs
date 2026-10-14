@@ -7,3 +7,4 @@ All notable changes to this repository, newest first. The format follows [Keep a
 ### Added
 
 - Course API: containerized with a multi-stage, non-root image and a health check (Lab 2)
+- `GET /healthz` documented in `api/README.md`
