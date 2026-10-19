@@ -1,0 +1,51 @@
+# Course application: PostgreSQL, the Lab 2 API, and the nginx web front.
+name: course-app
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: todo
+      POSTGRES_DB: todo
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "localhost", "-U", "todo", "-d", "todo"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    networks: [back]
+    restart: unless-stopped
+
+  # api:
+  #   build: ./api
+  #   environment:
+  #     DB_HOST: db
+  #     DB_USER: todo
+  #     DB_NAME: todo
+  #     DB_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   networks: [front, back]
+  #   restart: unless-stopped
+
+  # web:
+  #   build: ./web
+  #   ports:
+  #     - "8080:80"
+  #   depends_on:
+  #     api:
+  #       condition: service_started
+  #       restart: true
+  #   networks: [front]
+  #   restart: unless-stopped
+
+networks:
+  front:
+  back:
+
+volumes:
+  pgdata:
