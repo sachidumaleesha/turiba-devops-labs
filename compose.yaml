@@ -19,18 +19,18 @@ services:
     networks: [back]
     restart: unless-stopped
 
-  # api:
-  #   build: ./api
-  #   environment:
-  #     DB_HOST: db
-  #     DB_USER: todo
-  #     DB_NAME: todo
-  #     DB_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
-  #   depends_on:
-  #     db:
-  #       condition: service_healthy
-  #   networks: [front, back]
-  #   restart: unless-stopped
+  api:
+    build: ./api
+    environment:
+      DB_HOST: db
+      DB_USER: todo
+      DB_NAME: todo
+      DB_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks: [front, back]
+    restart: unless-stopped
 
   # web:
   #   build: ./web
