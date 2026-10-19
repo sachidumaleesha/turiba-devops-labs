@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Course app · todos</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 36rem; margin: 2rem auto; padding: 0 1rem; color: #1d2433; background: #fafafa; }
+    h1 { font-size: 1.5rem; }
+    form { display: flex; gap: .5rem; margin-bottom: 1rem; }
+    input[type=text] { flex: 1; padding: .5rem; }
+    ul { list-style: none; padding: 0; }
+    li { display: flex; align-items: center; gap: .5rem; padding: .4rem 0; border-bottom: 1px solid #ddd; }
+    li.done span { text-decoration: line-through; color: #777; }
+    li button { margin-left: auto; }
+    #status { min-height: 1.5rem; color: #b42318; }
+  </style>
+</head>
+<body>
+  <h1>Todos</h1>
+  <form id="add">
+    <input type="text" id="title" placeholder="What needs doing?" maxlength="200" required>
+    <button>Add</button>
+  </form>
+  <p id="status" role="status"></p>
+  <ul id="list"></ul>
+  <script src="app.js"></script>
+</body>
+</html>

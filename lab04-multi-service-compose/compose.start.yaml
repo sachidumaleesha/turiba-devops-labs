@@ -1,0 +1,56 @@
+# compose.yaml: the course app as three services (Lab 4, Part 2).
+# Copy this file to the root of your fork:  cp lab04-multi-service-compose/compose.start.yaml compose.yaml
+# Then fill in every blank (four underscores). The comment at the end of a line asks the question; the slide has the answer.
+#   Step 2.2: the db service (active now).
+#   Step 2.3: uncomment api: select its lines and press Ctrl+/ in VS Code.
+#   Step 2.4: uncomment web the same way.
+name: course-app
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: todo
+      POSTGRES_DB: todo
+      POSTGRES_PASSWORD: ${____:?set DB_PASSWORD in .env}   # which variable in .env? (slide 46)
+    volumes:
+      - ____:/var/lib/postgresql/data     # a named volume: which name? Declare it at the bottom too (slide 30)
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "____", "-U", "todo", "-d", "todo"]   # runs INSIDE db (slide 37)
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    networks: [back]                      # no ports: unreachable from the laptop
+    restart: unless-stopped
+
+  # api:                                    # your Lab 2 Dockerfile
+  #   build: ./api
+  #   environment:
+  #     DB_HOST: ____                       # how does api find the database? (slide 24)
+  #     DB_USER: todo
+  #     DB_NAME: todo
+  #     DB_PASSWORD: ${____:?set DB_PASSWORD in .env}
+  #   depends_on:
+  #     db:
+  #       condition: ____                   # started is not ready (slide 37)
+  #   networks: [____, ____]                # api talks to web and to db (slide 27)
+  #   restart: unless-stopped
+
+  # web:                                    # nginx: the page + the reverse proxy
+  #   build: ./web
+  #   ports:
+  #     - "____:____"                       # HOST:CONTAINER. Browser: 8080, nginx: 80 (slide 25)
+  #   depends_on:
+  #     api:
+  #       condition: service_started
+  #       restart: true                     # api recreated → restart web (slide 35)
+  #   networks: [front]
+  #   restart: unless-stopped
+
+networks:
+  front:
+  back:
+
+volumes:
+  ____:                                   # the same name as under db

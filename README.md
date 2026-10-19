@@ -9,6 +9,7 @@ Lab guides for **Software Development and IT Operations (DevOps)**, course ELE10
 | 1 | S1 · From virtualization to containers | [Ship it](lab01-ship-it/README.md) | A public image on GHCR and `lab1/README.md` in your fork |
 | 2 | S2 · Container images & the Linux survival kit | [Containerize it, then debug it](lab02-containerize-and-debug/README.md) | `api/Dockerfile`, `api/.dockerignore`, a public API image on GHCR and `lab2/README.md` in your fork. Due Wed 7 Oct, 22:00 |
 | 3 | S3 · Git & GitHub collaboration | [Branch, review, release](lab03-branch-review-release/README.md) | The URL of your fork on Evaluentis: two merged PRs, a protected `main`, release `v0.1.0`, and `lab3/README.md` in PR #3. Due 22:00 on the session day |
+| 4 | S4 · Multi-service apps with Docker Compose | [Multi-service app with Compose](lab04-multi-service-compose/README.md) | The URL of your fork on Evaluentis: compose.yaml, .env.example, web/nginx.conf, lab4/README.md and lab4/clinic/ on main, merged through a PR in your fork. Due Tue 20 Oct, 22:00 |
 
 The next lab guide is published here before its session.
 
@@ -76,6 +77,10 @@ Do [Part 0 of the Lab 2 guide](lab02-containerize-and-debug/README.md#part-0--be
 ## Before Lab 3 (at home)
 
 Do [Part 0 of the Lab 3 guide](lab03-branch-review-release/README.md#part-0--before-class-at-home-10-min): make sure Lab 2 is on GitHub, and set the five `git config` settings. Then sync your fork once more the old way (**Sync fork** → **Update branch**, then `git pull`) to get the Lab 3 material.
+
+## Before Lab 4 (at home)
+
+Do [Part 0 of the Lab 4 guide](lab04-multi-service-compose/README.md#part-0--before-class-at-home-20-min): bring the Lab 4 material into your fork through a pull request (the "From Lab 3 on" steps above), pull three images, and run `bash lab04-multi-service-compose/check.sh preflight`.
 
 ## Stuck?
 

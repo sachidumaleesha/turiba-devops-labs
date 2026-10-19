@@ -1,0 +1,23 @@
+# Added after compose.yaml by check.sh fresh and by the grader:
+#   docker compose -f compose.yaml -f run-override.yaml …
+# Only the web front is reachable, and only from this machine. Every service gets limits and never restarts.
+services:
+  web:
+    ports: !override
+      - "127.0.0.1:8080:80"
+    restart: "no"
+    mem_limit: 256m
+    cpus: 1
+    pids_limit: 200
+  api:
+    ports: !reset []
+    restart: "no"
+    mem_limit: 512m
+    cpus: 1
+    pids_limit: 200
+  db:
+    ports: !reset []
+    restart: "no"
+    mem_limit: 512m
+    cpus: 1
+    pids_limit: 200
