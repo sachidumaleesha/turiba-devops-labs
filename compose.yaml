@@ -32,16 +32,16 @@ services:
     networks: [front, back]
     restart: unless-stopped
 
-  # web:
-  #   build: ./web
-  #   ports:
-  #     - "8080:80"
-  #   depends_on:
-  #     api:
-  #       condition: service_started
-  #       restart: true
-  #   networks: [front]
-  #   restart: unless-stopped
+  web:
+    build: ./web
+    ports:
+      - "8080:80"
+    depends_on:
+      api:
+        condition: service_started
+        restart: true
+    networks: [front]
+    restart: unless-stopped
 
 networks:
   front:
