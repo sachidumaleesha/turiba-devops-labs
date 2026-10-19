@@ -1,0 +1,62 @@
+# Compose clinic, mission c6. Investigate with the usual docker compose commands in this folder.
+name: clinic-c6
+
+services:
+  web:
+    image: nginx:1.30-alpine
+    ports:
+      - "8106:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./public:/usr/share/nginx/html:ro
+    depends_on:
+      api:
+        condition: service_started
+        restart: true
+    networks: [front]
+
+  api:
+    image: ghcr.io/mleitass/lab4-clinic-api:1
+    environment:
+      DB_HOST: db
+      DB_USER: todo
+      DB_NAME: todo
+      DB_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    networks: [front, back]
+
+  migrate:                     # creates the table and adds a first todo, then exits
+    image: postgres:17-alpine
+    command: ["psql", "-h", "db", "-U", "todo", "-d", "todo", "-v", "ON_ERROR_STOP=1", "-c", "CREATE TABLE IF NOT EXISTS todos (id SERIAL PRIMARY KEY, title TEXT NOT NULL, done BOOLEAN NOT NULL DEFAULT false, created_at TIMESTAMPTZ NOT NULL DEFAULT now()); INSERT INTO todos (title) VALUES ('seeded by migrate');"]
+    environment:
+      PGPASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks: [back]
+
+  db:
+    image: postgres:17-alpine
+    entrypoint: ["sh", "-c", "sleep 8 && exec docker-entrypoint.sh postgres"]   # simulates a slow server: leave it
+    environment:
+      POSTGRES_USER: todo
+      POSTGRES_DB: todo
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "localhost", "-U", "todo", "-d", "todo"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    networks: [back]
+
+networks:
+  front:
+  back:
+
+volumes:
+  pgdata:
