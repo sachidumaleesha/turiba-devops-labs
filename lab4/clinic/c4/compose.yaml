@@ -1,0 +1,51 @@
+# Compose clinic, mission c4. Investigate with the usual docker compose commands in this folder.
+name: clinic-c4
+
+services:
+  web:
+    image: nginx:1.30-alpine
+    ports:
+      - "8104:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./public:/usr/share/nginx/html:ro
+    depends_on:
+      api:
+        condition: service_started
+        restart: true
+    networks: [front]
+
+  api:
+    image: ghcr.io/mleitass/lab4-clinic-api:1
+    environment:
+      DB_HOST: db
+      DB_USER: todo
+      DB_NAME: todo
+      DB_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks: [front, back]
+
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: todo
+      POSTGRES_DB: todo
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "localhost", "-U", "todo", "-d", "todo"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+      start_period: 5s
+    networks: [back]
+
+networks:
+  front:
+  back:
+
+volumes:
+  pgdata:

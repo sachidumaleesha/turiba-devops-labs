@@ -82,6 +82,54 @@ Why the restore must run before `api` starts: the API calls `ensureSchema()` dur
 - Why this fix, and not the tempting one: inside `api`, `localhost` is `api` itself, and nothing listens on 5432 there. Docker's DNS answers `db` with the database container's address. Publishing `db`'s port would "work" by opening a door into the database.
 - Hints used: 0
 
+### c2
+- Committed fix: `lab4/clinic/c2/`
+- Error line (copied): `curl: (7) Failed to connect to localhost port 8102: Connection refused`
+- Checkpoint (name / path / port / app / config / data): port
+- Fix: changed the web mapping to `8102:3000`, matching the required laptop port to nginx's actual container port.
+- Why this fix, and not the tempting one: Compose port mappings are `HOST:CONTAINER`. Changing nginx to listen on 8102 would hide the mapping mistake and change a file the mission says to leave intact.
+- Hints used: 0
+
+### c3
+- Committed fix: `lab4/clinic/c3/`
+- Error line (copied): `host not found in upstream "api"`
+- Checkpoint (name / path / port / app / config / data): name
+- Fix: placed `api` on both `front` and `back` networks.
+- Why this fix, and not the tempting one: Docker DNS resolves a service only across a shared network. `web` and `api` need `front`, while `api` and `db` need `back`. Moving `web` onto `back` would let the frontend reach the database directly and break the intended boundary.
+- Hints used: 0
+
+### c4
+- Committed fix: `lab4/clinic/c4/`
+- Error line (copied): `net::ERR_NAME_NOT_RESOLVED` for `http://api:5000/api/todos`
+- Checkpoint (name / path / port / app / config / data): path
+- Fix: changed the browser code to `const API = '/api/todos';`.
+- Why this fix, and not the tempting one: JavaScript runs in the laptop browser, outside Compose DNS. A relative URL goes to nginx on the same origin, which proxies it to `api:5000`. Publishing port 5000 would add an unnecessary public door and introduce a cross-origin request.
+- Hints used: 0
+
+### c5
+- Committed fix: `lab4/clinic/c5/`
+- Error line (copied): `GET /api/todos` returned `[]` after `docker compose down` and `up`.
+- Checkpoint (name / path / port / app / config / data): data
+- Fix: mounted the declared `pgdata` named volume at `/var/lib/postgresql/data`.
+- Why this fix, and not the tempting one: a container's writable layer is removed with the container. A named volume is managed by Docker and survives ordinary `down`; a host bind mount would couple database internals to a laptop path and is rejected by the mission.
+- Hints used: 0
+
+### c6
+- Committed fix: `lab4/clinic/c6/`
+- Error line (copied): `psql: error: connection to server at "db" (172.20.0.2), port 5432 failed: Connection refused`
+- Checkpoint (name / path / port / app / config / data): app
+- Fix: added a `pg_isready` health check to `db` and made `migrate` depend on `db` with `condition: service_healthy`.
+- Why this fix, and not the tempting one: `depends_on: [db]` waits only until the container process starts, before PostgreSQL may accept connections. A fixed sleep or retry loop guesses at readiness; the health check declares the real condition Compose must wait for.
+- Hints used: 0
+
+### c7
+- Committed fix: `lab4/clinic/c7/`
+- Error line (copied): `The "DB_PASS" variable is not set. Defaulting to a blank string.`
+- Checkpoint (name / path / port / app / config / data): config
+- Fix: used `${DB_PASSWORD:?set DB_PASSWORD in .env}` for both the API and PostgreSQL password values.
+- Why this fix, and not the tempting one: Compose interpolates variables by exact name, and `.env` defines `DB_PASSWORD`. Hard-coding the password would expose it in Git, while trust authentication would remove password protection entirely.
+- Hints used: 0
+
 ## 5 · Run in one command
 
 ```bash
