@@ -32,7 +32,7 @@ graph-report also directly needs graph-build, graph-lint, and graph-test.
 - B5, before I filled it in: `localhost` or `db`? I predicted ____ because ____
 - My first red run in Part 2 (the job, the first red step, the error line copied from the log): ____
 - What I changed to make it green: ____
-- My lint findings, and how I fixed them (fixed, not silenced): ____
+- My lint findings, and how I fixed them (fixed, not silenced): ESLint reported no findings. The existing SIGTERM handler already uses `server`, so no source fix or rule suppression was needed.
 - Part 2 pull request (URL): ____
 - Part 3: will the PR run push an image? I predicted ____. What happened: ____
 - My image on GHCR, from the `main` run: `ghcr.io/____/turiba-devops-labs/api:____`
