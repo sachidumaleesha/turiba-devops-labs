@@ -29,7 +29,7 @@ graph-report also directly needs graph-build, graph-lint, and graph-test.
 
 ## 2 · Pipeline
 
-- B5, before I filled it in: `localhost` or `db`? I predicted ____ because ____
+- B5, before I filled it in: `localhost` or `db`? I predicted `localhost` because the job steps run directly on the GitHub-hosted runner and reach the PostgreSQL service through the published host port `5432`. The service label `db` would be used by another container on the service network.
 - My first red run in Part 2 (the job, the first red step, the error line copied from the log): ____
 - What I changed to make it green: ____
 - My lint findings, and how I fixed them (fixed, not silenced): ESLint reported no findings. The existing SIGTERM handler already uses `server`, so no source fix or rule suppression was needed.
