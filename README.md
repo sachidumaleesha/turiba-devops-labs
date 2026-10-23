@@ -10,6 +10,7 @@ Lab guides for **Software Development and IT Operations (DevOps)**, course ELE10
 | 2 | S2 · Container images & the Linux survival kit | [Containerize it, then debug it](lab02-containerize-and-debug/README.md) | `api/Dockerfile`, `api/.dockerignore`, a public API image on GHCR and `lab2/README.md` in your fork. Due Wed 7 Oct, 22:00 |
 | 3 | S3 · Git & GitHub collaboration | [Branch, review, release](lab03-branch-review-release/README.md) | The URL of your fork on Evaluentis: two merged PRs, a protected `main`, release `v0.1.0`, and `lab3/README.md` in PR #3. Due 22:00 on the session day |
 | 4 | S4 · Multi-service apps with Docker Compose | [Multi-service app with Compose](lab04-multi-service-compose/README.md) | The URL of your fork on Evaluentis: compose.yaml, .env.example, web/nginx.conf, lab4/README.md and lab4/clinic/ on main, merged through a PR in your fork. Due Tue 20 Oct, 22:00 |
+| 5 | S5 · Continuous Integration I | [Your first CI pipeline](lab05-ci-pipeline/README.md) | The URL of your fork on Evaluentis: a green CI pipeline on main, an image on GHCR, four required checks, a red-then-green PR, and lab5/README.md. Due Wed 21 Oct, 22:00 |
 
 The next lab guide is published here before its session.
 
@@ -18,6 +19,7 @@ The next lab guide is published here before its session.
 | Folder | What it is |
 |--------|------------|
 | `lab0N-…/` | The lab guides. Read them; don't change them |
+| `.github/workflows/` | Workflows that run in your fork on GitHub (from Lab 5 on). The course ships `lab05-graph.yml`; your own `ci.yml` goes here too |
 | `api/` | The **course API**, a small todo service in Node.js. You containerize it in Lab 2 and keep improving it all semester ([details](api/README.md)) |
 | `lab1/`, `lab2/`, … | Created by you in your fork: your write-up for each lab |
 
@@ -81,6 +83,10 @@ Do [Part 0 of the Lab 3 guide](lab03-branch-review-release/README.md#part-0--bef
 ## Before Lab 4 (at home)
 
 Do [Part 0 of the Lab 4 guide](lab04-multi-service-compose/README.md#part-0--before-class-at-home-20-min): bring the Lab 4 material into your fork through a pull request (the "From Lab 3 on" steps above), pull three images, and run `bash lab04-multi-service-compose/check.sh preflight`.
+
+## Before Lab 5 (at home if you can)
+
+Do [Part 0 of the Lab 5 guide](lab05-ci-pipeline/README.md#part-0--sync-and-check-10-min-at-home-if-you-can-slide-8): bring the Lab 5 material into your fork through a pull request (the "From Lab 3 on" steps above), check that `origin` uses SSH, open your fork's **Actions** tab, and run `bash lab05-ci-pipeline/ghcr-check.sh`.
 
 ## Stuck?
 
