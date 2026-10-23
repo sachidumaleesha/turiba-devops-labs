@@ -1,0 +1,83 @@
+# Lab 5, Part 1 · Predict the graph (slides 10, 13–15).
+# Draw the graph in lab5/README.md first. Then: Actions → lab05 graph → Run workflow.
+# Run it twice: once with break = none, once with break = build.
+# Don't edit this file. The grader reads the results of both runs.
+name: lab05 graph
+
+on:
+  workflow_dispatch:
+    inputs:
+      break:
+        description: "Make one job fail on purpose"
+        type: choice
+        options: [none, build]
+        default: none
+
+permissions:
+  contents: read
+
+jobs:
+  graph-build:
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.meta.outputs.version }}    # a small value for other jobs (slide 14)
+    steps:
+      - name: Set the job output
+        id: meta
+        run: echo "version=1.0.${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+      - name: Write build.txt
+        run: echo "made by graph-build in run ${{ github.run_number }}" > build.txt
+      - name: Fail on purpose (only when break = build)
+        if: inputs.break == 'build'
+        run: |
+          echo "break = build, so this step fails on purpose"
+          exit 1
+      - name: Upload build.txt as an artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: build-output
+          path: build.txt
+          retention-days: 7
+
+  graph-lint:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Needs nothing
+        run: echo "graph-lint has no needs, so it starts together with graph-build"
+
+  graph-test:
+    needs: graph-build
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Download build.txt
+        uses: actions/download-artifact@v8
+        with:
+          name: build-output
+      - name: Read the file and the job output
+        env:
+          VERSION: ${{ needs.graph-build.outputs.version }}
+        run: |
+          echo "version from graph-build: $VERSION"
+          cat build.txt
+
+  graph-package:
+    needs: [graph-lint, graph-test]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Look for build.txt (no download step)
+        run: |
+          if [ -f build.txt ]; then
+            cat build.txt
+          else
+            echo "build.txt: not here: jobs don't share files"
+          fi
+
+  graph-report:
+    needs: [graph-build, graph-lint, graph-test, graph-package]
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - name: What every job before me reported
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: printf '%s\n' "$RESULTS"
