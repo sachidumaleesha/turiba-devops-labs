@@ -30,11 +30,11 @@ graph-report also directly needs graph-build, graph-lint, and graph-test.
 ## 2 · Pipeline
 
 - B5, before I filled it in: `localhost` or `db`? I predicted `localhost` because the job steps run directly on the GitHub-hosted runner and reach the PostgreSQL service through the published host port `5432`. The service label `db` would be used by another container on the service network.
-- My first red run in Part 2 (the job, the first red step, the error line copied from the log): ____
-- What I changed to make it green: ____
+- My first red run in Part 2 (the job, the first red step, the error line copied from the log): There was no red run. The first `ci` run (#1, run ID `39916380312`) passed all four jobs.
+- What I changed to make it green: No follow-up change was required; lint and unit tests passed locally before the branch was pushed, and GitHub Actions also passed the integration and image jobs.
 - My lint findings, and how I fixed them (fixed, not silenced): ESLint reported no findings. The existing SIGTERM handler already uses `server`, so no source fix or rule suppression was needed.
-- Part 2 pull request (URL): ____
-- Part 3: will the PR run push an image? I predicted ____. What happened: ____
+- Part 2 pull request (URL): https://github.com/sachidumaleesha/turiba-devops-labs/pull/9
+- Part 3: will the PR run push an image? I predicted no: a pull-request run should build the image as a check, but `push` should be false and registry login should be skipped. What happened: the `image` job succeeded, `Log in to GHCR (main only)` was skipped, and the build step completed without publishing.
 - My image on GHCR, from the `main` run: `ghcr.io/____/turiba-devops-labs/api:____`
 
 ## 3 · Red PR
