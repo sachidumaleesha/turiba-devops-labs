@@ -35,7 +35,7 @@ graph-report also directly needs graph-build, graph-lint, and graph-test.
 - My lint findings, and how I fixed them (fixed, not silenced): ESLint reported no findings. The existing SIGTERM handler already uses `server`, so no source fix or rule suppression was needed.
 - Part 2 pull request (URL): https://github.com/sachidumaleesha/turiba-devops-labs/pull/9
 - Part 3: will the PR run push an image? I predicted no: a pull-request run should build the image as a check, but `push` should be false and registry login should be skipped. What happened: the `image` job succeeded, `Log in to GHCR (main only)` was skipped, and the build step completed without publishing.
-- My image on GHCR, from the `main` run: `ghcr.io/sachidumaleesha/turiba-devops-labs/api:df2e24149fefe59d7f8821bfb968c3701061b8ac`
+- My image on GHCR, from the `main` run: `ghcr.io/sachidumaleesha/turiba-devops-labs/api:b5d66daaab9d3b2f4e6985fe0a6bea0ee235b638`
 
 ## 3 · Red PR
 
@@ -47,10 +47,10 @@ graph-report also directly needs graph-build, graph-lint, and graph-test.
 
 ## 4 · Answers
 
-**A1.** ____
+**A1.** In my `break: build` run the job list was: `graph-lint` — success, `graph-build` — failure, `graph-test` — skipped, `graph-package` — skipped, and `graph-report` — success. `graph-build` and `graph-lint` had no dependencies, so both started. `graph-test` needed the failed build, and `graph-package` needed successful build, lint, and test jobs, so GitHub skipped them. `graph-report` still ran because it uses `if: always()`, which tells GitHub to evaluate that job even when jobs in its `needs` list fail or are skipped.
 
-**A2.** ____
+**A2.** Every job gets a fresh runner with its own filesystem. `graph-build` uploaded `build.txt` as an artifact, and `graph-test` found it only because its `Download the build` step used `actions/download-artifact`. `graph-package` did not download the artifact, so the file was absent even though the build job had created it. Adding an `actions/download-artifact` step for the same artifact before `graph-package` checks the file would make it available there.
 
-**A3.** ____
+**A3.** The integration commands run directly on the GitHub-hosted runner, while the PostgreSQL service publishes its container port to the runner's port `5432`; therefore the runner connects to `localhost`. In Compose, the API and database are containers on the same Docker network, so Docker DNS resolves the service name `db`. If the whole Actions job used `container: node:24-alpine`, its steps would also be on the container network and `DB_HOST` would be `db`.
 
-**A4.** ____
+**A4.** The required `integration` check failed on the first red run. The workflow tested GitHub's synthetic merge commit `c5c15d7`, which merged my test commit `a51e0d5` with the current `main`, as shown by the checkout of `refs/remotes/pull/10/merge`. The active `protect-main` ruleset required all four checks, so the failed integration check (and consequently skipped image check) disabled merging. On the Part 2 PR the `image` job ran because lint, unit, and integration all succeeded, but it only built the image: registry login was conditional on `main`, and the build used `push: false` for a pull-request event.
