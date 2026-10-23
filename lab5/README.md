@@ -35,15 +35,15 @@ graph-report also directly needs graph-build, graph-lint, and graph-test.
 - My lint findings, and how I fixed them (fixed, not silenced): ESLint reported no findings. The existing SIGTERM handler already uses `server`, so no source fix or rule suppression was needed.
 - Part 2 pull request (URL): https://github.com/sachidumaleesha/turiba-devops-labs/pull/9
 - Part 3: will the PR run push an image? I predicted no: a pull-request run should build the image as a check, but `push` should be false and registry login should be skipped. What happened: the `image` job succeeded, `Log in to GHCR (main only)` was skipped, and the build step completed without publishing.
-- My image on GHCR, from the `main` run: `ghcr.io/____/turiba-devops-labs/api:____`
+- My image on GHCR, from the `main` run: `ghcr.io/sachidumaleesha/turiba-devops-labs/api:df2e24149fefe59d7f8821bfb968c3701061b8ac`
 
 ## 3 · Red PR
 
-- Red PR (URL): ____
-- The test that failed, with Expected and Received (copied): ____
-- The cause line from "On failure: the API log" (copied): ____
-- The merge box while it was red (the text, copied): ____
-- Which commit did the red check test: your branch alone, or your branch merged with `main`? How do you know? ____
+- Red PR (URL): https://github.com/sachidumaleesha/turiba-devops-labs/pull/10
+- The test that failed, with Expected and Received (copied): `DELETE with an id that is not a number answers 404` — `Expected: 404`, `Received: 500`.
+- The cause line from "On failure: the API log" (copied): `DELETE /api/todos/abc failed: invalid input syntax for type integer: "abc"`
+- The merge box while it was red (the text, copied): `Some checks were not successful` — `1 failing, 1 skipped, 3 successful checks`; the `Merge pull request` button was disabled.
+- Which commit did the red check test: your branch alone, or your branch merged with `main`? How do you know? It tested the branch merged with `main`. The checkout log fetched `refs/remotes/pull/10/merge` and reported `HEAD is now at c5c15d7 Merge a51e0d5... into df2e241...`.
 
 ## 4 · Answers
 
