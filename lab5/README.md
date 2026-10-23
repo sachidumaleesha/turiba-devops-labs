@@ -25,7 +25,7 @@ graph-report also directly needs graph-build, graph-lint, and graph-test.
 |---|----------|----------------------|---------------------|
 | P1 | Which jobs start together? | `graph-build` and `graph-lint`, because neither job has `needs`. | Run 1 showed both starting at 06:53:34 UTC; both succeeded. |
 | P2 | Will `graph-package` find `build.txt`? | No. Jobs have separate runner filesystems, and `graph-package` has no artifact download step. | No. `graph-test` downloaded it and printed `made by graph-build in run 1`; `graph-package` printed `build.txt: not here: jobs don't share files`. |
-| P3 | With `break = build`: which jobs run, which fail, which are skipped? | `graph-build` and `graph-lint` run; `graph-build` fails while `graph-lint` succeeds. `graph-test` and then `graph-package` are skipped because their dependencies did not all succeed. `graph-report` still runs and succeeds because it has `if: always()`. | Pending the second run. |
+| P3 | With `break = build`: which jobs run, which fail, which are skipped? | `graph-build` and `graph-lint` run; `graph-build` fails while `graph-lint` succeeds. `graph-test` and then `graph-package` are skipped because their dependencies did not all succeed. `graph-report` still runs and succeeds because it has `if: always()`. | Run 2 matched: `graph-lint` succeeded, `graph-build` failed in `Fail on purpose`, `graph-test` and `graph-package` were skipped, and `graph-report` succeeded. |
 
 ## 2 · Pipeline
 
