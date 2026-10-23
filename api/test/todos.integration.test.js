@@ -72,3 +72,7 @@ test('POST with a blank title answers 400 and stores nothing', async () => {
   const list = await call('GET', '/api/todos');
   expect(list.body.some((todo) => todo.title.trim() === '')).toBe(false);
 });
+
+test('DELETE with an id that is not a number answers 404', async () => {
+  expect((await call('DELETE', '/api/todos/abc')).status).toBe(404);
+});
