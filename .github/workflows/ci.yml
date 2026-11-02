@@ -115,6 +115,20 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build for the smoke test (amd64, kept on the runner)
+        uses: docker/build-push-action@v7
+        with:
+          context: api
+          load: true
+          tags: ${{ env.IMAGE }}:${{ github.sha }}
+      - name: Smoke test the image
+        run: |
+          docker run -d --name smoke -p 5000:5000 "$IMAGE:${{ github.sha }}"
+          if ! curl --silent --show-error --fail --retry 10 --retry-delay 1 --retry-all-errors http://localhost:5000/; then
+            echo "::error::The image did not answer GET /. Its log:"
+            docker logs smoke
+            exit 1
+          fi
       - name: Build, and push from main only
         uses: docker/build-push-action@v7
         with:
