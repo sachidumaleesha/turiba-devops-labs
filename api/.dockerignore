@@ -9,6 +9,3 @@ coverage
 Dockerfile*
 .dockerignore
 
-# Local helper scripts, not needed in the image
-banner.js
-
