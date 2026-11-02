@@ -1,0 +1,128 @@
+# Lab 5 reference pipeline: .github/workflows/ci.yml as it should be at the end of Lab 5.
+# Use it only if your own Lab 5 pipeline isn't green (Lab 6, Part 0). It costs no points:
+#   cp lab06-test-and-release/reference/ci.yml .github/workflows/ci.yml
+# It still needs everything else from Lab 5: the DB_PASSWORD secret, api/eslint.config.js,
+# the npm scripts lint / test / test:integration, and the four required checks on main.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read                                    # every job reads the code, nothing more
+
+jobs:
+  lint:
+    name: lint                                 # the check name: never rename it (slide 22)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - run: npm ci
+      - name: Lint
+        run: npm run lint
+
+  unit:
+    name: unit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - run: npm ci
+      - name: Unit tests (no database)
+        run: npm test
+
+  integration:
+    name: integration
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    services:
+      db:                                           # the label; Compose calls it the service name
+        image: postgres:17-alpine  # the same image as db in compose.yaml
+        env:
+          POSTGRES_USER: todo
+          POSTGRES_DB: todo
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        ports:
+          - 5432:5432                               # the steps run on the runner, so they need a published port
+        options: >-
+          --health-cmd "pg_isready -h localhost -U todo -d todo"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 15
+    env:                                            # what the API and the test read (api/.env.example)
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_USER: todo
+      DB_NAME: todo
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      PORT: 5000
+      API_URL: http://localhost:5000
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - run: npm ci
+      - name: Start the API from source (not the image)
+        run: node server.js > server.log 2>&1 &
+      - name: Wait until the API answers from the database
+        run: >-
+          curl --silent --show-error --fail
+          --retry 30 --retry-delay 1 --retry-all-errors
+          "$API_URL/api/todos"
+      - name: Integration tests
+        run: npm run test:integration
+      - name: "On failure: the API log"
+        if: failure()
+        run: cat server.log
+      - name: "On failure: the database log"
+        if: failure()
+        run: docker logs "${{ job.services.db.id }}"
+
+  image:
+    name: image
+    needs: [lint, unit, integration]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write  # only this job may push to GHCR
+    steps:
+      - uses: actions/checkout@v7
+      - name: Image name in lowercase
+        run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}/api" >> "$GITHUB_ENV"
+      - uses: docker/setup-qemu-action@v4           # lets the runner build arm64 images
+      - uses: docker/setup-buildx-action@v4
+      - name: Log in to GHCR (main only)
+        if: github.event_name == 'push'
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build, and push from main only
+        uses: docker/build-push-action@v7
+        with:
+          context: api
+          platforms: ${{ github.event_name == 'push' && 'linux/amd64,linux/arm64' || 'linux/amd64' }}
+          push: ${{ github.event_name == 'push' }}
+          tags: ${{ env.IMAGE }}:${{ github.sha }}
