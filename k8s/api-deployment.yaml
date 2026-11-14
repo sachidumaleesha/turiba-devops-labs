@@ -36,7 +36,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: db-secret
-                  key: pasword
+                  key: password
           readinessProbe:
             httpGet:
               path: /healthz
