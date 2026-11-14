@@ -1,0 +1,13 @@
+# Lab 8 fallback: Mission 7's starting point. Copy it into k8s/ only if your own Mission 7 files don't work.
+apiVersion: v1
+kind: Service
+metadata:
+  name: api
+  namespace: course
+spec:
+  type: ClusterIP
+  selector:
+    app: api
+  ports:
+    - port: 80
+      targetPort: 5000

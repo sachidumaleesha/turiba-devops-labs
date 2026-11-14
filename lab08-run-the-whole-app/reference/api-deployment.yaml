@@ -1,0 +1,22 @@
+# Lab 8 fallback: Mission 7's starting point. Copy it into k8s/ only if your own Mission 7 files don't work.
+# The image is the course fallback. Use your own release instead if you have one: never latest.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  namespace: course
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+        - name: api
+          image: ghcr.io/martinsturiba/turiba-devops-labs/api:0.2.0
+          ports:
+            - containerPort: 5000

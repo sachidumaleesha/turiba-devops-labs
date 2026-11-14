@@ -1,0 +1,6 @@
+# Lab 8 fallback: Mission 7's starting point. Copy it into k8s/ only if your own Mission 7 files don't work.
+# 00- so that one `kubectl apply -f k8s/` creates the Namespace first (files are applied in name order).
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: course
