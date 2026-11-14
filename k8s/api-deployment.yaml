@@ -37,3 +37,21 @@ spec:
                 secretKeyRef:
                   name: db-secret
                   key: password
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 5000
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 128Mi
