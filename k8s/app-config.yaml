@@ -4,7 +4,7 @@ metadata:
   name: app-config
   namespace: course
 data:
-  DB_HOST: db
+  DB_HOST: database
   DB_PORT: "5432"
   DB_USER: todo
   DB_NAME: todo
