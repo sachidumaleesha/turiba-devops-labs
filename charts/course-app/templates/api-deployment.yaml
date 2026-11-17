@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: api
 spec:
-  replicas: 3
+  replicas: {{ .Values.api.replicas }}
   selector:
     matchLabels:
       app: api
@@ -24,7 +24,7 @@ spec:
                 name: app-config
       containers:
         - name: api
-          image: ghcr.io/sachidumaleesha/turiba-devops-labs/api:2bbd3a6783d7b43dbe0b46db85d556ed4ba95786
+          image: "{{ .Values.api.image.repository }}:{{ .Values.api.image.tag }}"
           ports:
             - containerPort: 5000
           envFrom:
