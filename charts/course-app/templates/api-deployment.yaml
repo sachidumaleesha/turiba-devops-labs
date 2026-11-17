@@ -24,7 +24,7 @@ spec:
                 name: app-config
       containers:
         - name: api
-          image: "{{ .Values.api.image.repository }}:{{ .Values.api.image.tag }}"
+          image: "{{ .Values.api.images.repository }}:{{ .Values.api.image.tag }}"
           ports:
             - containerPort: 5000
           envFrom:
