@@ -1,5 +1,0 @@
-# The chart brings its own namespace, so nobody has to create it by hand.
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: {{ .Release.Namespace }}
