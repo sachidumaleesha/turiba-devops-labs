@@ -1,0 +1,11 @@
+# Lab 9 fallback: the Mission 8 files (k8s/). Copy them into k8s/ only if your own Mission 8 doesn't work (Part 0).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: course
+data:
+  DB_HOST: db
+  DB_PORT: "5432"
+  DB_USER: todo
+  DB_NAME: todo

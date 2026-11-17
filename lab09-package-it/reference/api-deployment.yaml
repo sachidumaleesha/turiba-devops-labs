@@ -1,0 +1,44 @@
+# Lab 9 fallback: the Mission 8 files (k8s/). Copy them into k8s/ only if your own Mission 8 doesn't work (Part 0).
+# The image is the course fallback. Use your own release instead if you have one: never latest.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  namespace: course
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      initContainers:
+        - name: wait-for-db
+          image: postgres:17-alpine
+          command: ["sh", "-c", "until pg_isready -h \"$DB_HOST\" -p \"$DB_PORT\"; do echo waiting for the database; sleep 2; done"]
+          envFrom:
+            - configMapRef: { name: app-config }
+      containers:
+        - name: api
+          image: ghcr.io/martinsturiba/turiba-devops-labs/api:0.2.0
+          ports:
+            - containerPort: 5000
+          envFrom:
+            - configMapRef: { name: app-config }
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: db-secret, key: password }
+          readinessProbe:
+            httpGet: { path: /healthz, port: 5000 }
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: { path: /healthz, port: 5000 }
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          resources:
+            requests: { cpu: 50m, memory: 64Mi }
+            limits: { cpu: 500m, memory: 128Mi }
