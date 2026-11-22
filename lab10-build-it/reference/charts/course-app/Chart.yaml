@@ -1,0 +1,8 @@
+# The Mission 9 fallback chart (Lab 10). Use it only if your own chart does not work, and write
+# "Fallback chart used: yes" at the top of lab10/README.md.
+apiVersion: v2
+name: course-app
+description: The course todo app (API and PostgreSQL) on Kubernetes
+type: application
+version: 0.1.0
+appVersion: "0.2.0"
