@@ -3,7 +3,7 @@ terraform {
 
   required_providers {
     kind = {
-      source  = "hashicorp/kind"
+      source  = "tehcyx/kind"
       version = "~> 0.13.0"
     }
     kubernetes = {
