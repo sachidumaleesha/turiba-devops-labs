@@ -1,0 +1,5 @@
+api:
+  image:
+    repository: ghcr.io/martinsturiba/turiba-devops-labs/api
+    tag: "0.2.0"
+  replicas: 3
