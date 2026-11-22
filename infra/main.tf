@@ -27,8 +27,8 @@ resource "kubernetes_secret_v1" "db" {
 
 resource "helm_release" "course_app" {
   name      = "course-app"
-  namespace = kubernetes_namespace_v1.course.metadata[0].name
-  chart     = "${path.module}/../charts/course-app"
+  namespace = "courses"
+  chart     = "${path.module}/../chart/course-app"
 
   set = [
     {
