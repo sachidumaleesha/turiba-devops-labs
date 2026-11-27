@@ -127,7 +127,7 @@ I used the standard course application and assignment materials. My Mission 7–
 
 ## Level and evidence
 
-I currently claim **Minimum plus T1 (Infrastructure as code)**. T2 and T3 are listed honestly under `## Known issues` and are not claimed yet.
+I currently claim **Target without T3**: Minimum (M1–M7), T1 (Infrastructure as code) and T2 (Security gates). T3 is listed honestly under `## Known issues` and is not claimed.
 
 | Item | Evidence |
 |------|----------|
@@ -136,9 +136,13 @@ I currently claim **Minimum plus T1 (Infrastructure as code)**. T2 and T3 are li
 | M3 · CI | [green CI run on the tagged `main` commit](https://github.com/sachidumaleesha/turiba-devops-labs/actions/runs/45980616569) · [`ci.yml`](https://github.com/sachidumaleesha/turiba-devops-labs/blob/main/.github/workflows/ci.yml) · [smoke-test PR #13](https://github.com/sachidumaleesha/turiba-devops-labs/pull/13) |
 | M4 · Release 1.0.0 | [Release `v1.0.0`](https://github.com/sachidumaleesha/turiba-devops-labs/releases/tag/v1.0.0) · [release workflow run](https://github.com/sachidumaleesha/turiba-devops-labs/actions/runs/45981005905) · [public GHCR package](https://github.com/sachidumaleesha/turiba-devops-labs/pkgs/container/turiba-devops-labs%2Fapi) |
 | M5 · Kubernetes with Helm | [`values.yaml` using `1.0.0`](https://github.com/sachidumaleesha/turiba-devops-labs/blob/main/charts/course-app/values.yaml) · [PR #40](https://github.com/sachidumaleesha/turiba-devops-labs/pull/40) · [`lab9/README.md`](https://github.com/sachidumaleesha/turiba-devops-labs/blob/main/lab9/README.md) · fresh install, persistence, upgrade and rollback tested on 27 Nov 2026 |
-| M6 · No secrets in Git | [ignored local secrets and state](https://github.com/sachidumaleesha/turiba-devops-labs/blob/main/.gitignore) · [`infra/.gitignore`](https://github.com/sachidumaleesha/turiba-devops-labs/blob/main/infra/.gitignore) · full-history gitleaks scan of 79 commits on 27 Nov 2026; its seven matches were verified false positives consisting only of public GHCR image tags and course checker constants |
+| M6 · No secrets in Git | [ignored local secrets and state](https://github.com/sachidumaleesha/turiba-devops-labs/blob/main/.gitignore) · [`infra/.gitignore`](https://github.com/sachidumaleesha/turiba-devops-labs/blob/main/infra/.gitignore) · [exact-fingerprint `.gitleaksignore`](https://github.com/sachidumaleesha/turiba-devops-labs/blob/main/.gitleaksignore) · full-history scan of 80 commits passed locally on 27 Nov 2026 |
 | M7 · Documentation | This file, including the fresh-clone runbook tested on 27 Nov 2026 |
 | T1 · Infrastructure as code | [`infra/`](https://github.com/sachidumaleesha/turiba-devops-labs/tree/main/infra) · [cluster PR #33](https://github.com/sachidumaleesha/turiba-devops-labs/pull/33) · [application PR #34](https://github.com/sachidumaleesha/turiba-devops-labs/pull/34) · [`lab10/README.md`](https://github.com/sachidumaleesha/turiba-devops-labs/blob/main/lab10/README.md) · `destroy → apply` rebuild passed on 27 Nov 2026 |
+| T2 · gitleaks | [`ci.yml`, job `gitleaks`](https://github.com/sachidumaleesha/turiba-devops-labs/blob/main/.github/workflows/ci.yml) · [required in the `protect-main` ruleset](https://github.com/sachidumaleesha/turiba-devops-labs/rules/25098939) · [PR #42](https://github.com/sachidumaleesha/turiba-devops-labs/pull/42) · [green `main` run](https://github.com/sachidumaleesha/turiba-devops-labs/actions/runs/45986407382) |
+| T2 · Trivy | [`ci.yml`, scan before push](https://github.com/sachidumaleesha/turiba-devops-labs/blob/main/.github/workflows/ci.yml) · [PR #43](https://github.com/sachidumaleesha/turiba-devops-labs/pull/43) · [green `main` run](https://github.com/sachidumaleesha/turiba-devops-labs/actions/runs/45987469783) |
+| T2 · Dependabot | [`.github/dependabot.yml`](https://github.com/sachidumaleesha/turiba-devops-labs/blob/main/.github/dependabot.yml) · [configuration PR #44](https://github.com/sachidumaleesha/turiba-devops-labs/pull/44) · [Dependabot PR #45 closed with the reason](https://github.com/sachidumaleesha/turiba-devops-labs/pull/45) |
+| T2 · SHA pins | [`ci.yml`](https://github.com/sachidumaleesha/turiba-devops-labs/blob/main/.github/workflows/ci.yml) and [`release.yml`](https://github.com/sachidumaleesha/turiba-devops-labs/blob/main/.github/workflows/release.yml) · [PR #49](https://github.com/sachidumaleesha/turiba-devops-labs/pull/49) · [green `main` run](https://github.com/sachidumaleesha/turiba-devops-labs/actions/runs/46043383966) |
 
 ## When it breaks
 
@@ -152,9 +156,7 @@ For a general first look I use `kubectl -n course get pods`, then `kubectl -n co
 
 ## Known issues
 
-- **T2 is not implemented yet.** CI does not yet contain a required `gitleaks` job or Trivy step, `.github/dependabot.yml` is absent, and third-party actions are version-tagged rather than pinned to full commit SHAs.
 - **T3 is not implemented yet.** kube-prometheus-stack, `observability/dashboard.json` and the Grafana screenshot are not present.
-- A local full-history gitleaks scan reports seven false positives: public GHCR image tags in course checker files/write-ups. No password, token or private credential was found, but a future T2 configuration must allowlist these exact non-secret values so the required job is green.
 - On this Windows laptop, WSL's Docker credential helper could not perform the first kind image pull. Pulling the exact image once through Windows Docker made the subsequent OpenTofu build and rebuild pass.
 - The web front end runs only under Compose. The capstone makes the front end optional on Kubernetes; the cluster intentionally runs the API and PostgreSQL only.
 
