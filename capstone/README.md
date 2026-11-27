@@ -206,4 +206,6 @@ For a general first look I use `kubectl -n course get pods`, then `kubectl -n co
 
 ## AI use
 
-I used OpenAI Codex to audit the fork against the capstone brief, help restore retained mission files, verify CI and release evidence, run the fresh-clone Compose/OpenTofu tests, build and validate the Grafana dashboard, and draft this write-up from the observed results. I reviewed the commands and outputs, and I will rehearse and explain the repository flow myself for the exam.
+I used OpenAI Codex as a pair-programming and troubleshooting assistant while rebuilding the labs and finishing this capstone. It helped me compare my fork with the brief, investigate CI, Helm and OpenTofu problems, prepare the security checks and Grafana dashboard, and improve the documentation.
+
+I did not accept changes blindly: I reviewed the diffs, ran the commands, checked the GitHub Actions and live cluster results, and kept only changes I could understand and explain. For the exam, I can describe how a commit moves through CI and release into the Helm/OpenTofu deployment, and how gitleaks, Trivy and Grafana verify it.
