@@ -1,5 +1,5 @@
 api:
   image:
     repository: ghcr.io/sachidumaleesha/turiba-devops-labs/api
-    tag: "0.2.0"
+    tag: "1.0.0"
   replicas: 3
