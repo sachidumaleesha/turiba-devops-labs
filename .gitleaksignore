@@ -1,0 +1,9 @@
+# Public GHCR image tags misidentified as generic API keys in course material.
+# Exact fingerprints keep future findings in these files visible.
+b08e0c5c233876c6313bb577400167a8a61fe184:lab09-package-it/check.py:generic-api-key:45
+d4ba418c1952256c54a620071dbf570288750e88:lab09-package-it/check.py:generic-api-key:45
+045cee8100766e6bb071fcfcb8c939837efa94d8:lab08-run-the-whole-app/check.py:generic-api-key:40
+9123e2995b0ff86f24c5d7bcc8b6b58449fad249:lab5/README.md:generic-api-key:38
+d151c253962e88d36fbc3576915d777daf7ac73d:lab5/README.md:generic-api-key:38
+5ce4dcbf6f2d7aadea4dda3476375d6114aa0067:lab08-run-the-whole-app/check.py:generic-api-key:40
+be02709c87549659aaa545d8b54587afe008848a:lab07-run-it-on-a-cluster/README.md:generic-api-key:237
