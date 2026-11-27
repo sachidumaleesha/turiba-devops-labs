@@ -6,7 +6,7 @@ The course todo application from a commit to a running cluster: Docker Compose r
 
 I tested these steps on 27 November 2026 in a fresh clone on Windows 11 with WSL Ubuntu and Docker Desktop. I started with no running Compose containers and no kind clusters. The Compose application, Kubernetes deployment, persistent database, Helm upgrade and rollback, and an OpenTofu destroy/rebuild all passed.
 
-**Prerequisites:** Git, Docker Desktop with WSL integration, kind, kubectl, Helm and OpenTofu.
+**Prerequisites:** Git, Docker Desktop with WSL integration, kind, kubectl, Helm, OpenTofu, curl and jq.
 
 ```bash
 # 1. Clone the repository
@@ -67,6 +67,47 @@ curl --fail http://localhost:8081/api/todos
 
 The same todo must appear after the replacement database Pod becomes ready.
 
+Install the monitoring stack while still in `infra/`:
+
+```bash
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+helm upgrade --install kps prometheus-community/kube-prometheus-stack \
+  --version 94.2.0 \
+  --namespace monitoring \
+  --create-namespace \
+  --wait \
+  --timeout 10m
+
+kubectl -n monitoring get pods
+```
+
+Start the Grafana port-forward in another terminal:
+
+```bash
+kubectl -n monitoring port-forward service/kps-grafana 3000:80
+```
+
+Back in the `infra/` terminal, import the saved dashboard through Grafana's API:
+
+```bash
+GRAFANA_PASSWORD="$(kubectl -n monitoring get secret kps-grafana \
+  -o jsonpath='{.data.admin-password}' | base64 -d)"
+
+jq -n --slurpfile dashboard ../observability/dashboard.json \
+  '{dashboard: $dashboard[0], overwrite: true}' | \
+  curl --fail --user "admin:${GRAFANA_PASSWORD}" \
+    -H 'Content-Type: application/json' \
+    --data-binary @- \
+    http://localhost:3000/api/dashboards/db
+
+unset GRAFANA_PASSWORD
+```
+
+Open <http://localhost:3000/d/course-app-observability> and log in as `admin` with the generated password. On 27 November 2026 the dashboard reported **4 ready Pods**, **0 container restarts**, about **0.0059 CPU cores** in total and about **95.7 MiB** of working-set memory across the `course` namespace. The time-series panels also separated the three API Pods and the PostgreSQL Pod, making a single busy or unhealthy Pod visible.
+
+![Grafana dashboard showing ready Pods, restarts, CPU and memory](dashboard.png)
+
 Test the Helm lifecycle from `infra/`:
 
 ```bash
@@ -104,6 +145,8 @@ flowchart LR
   Release --> Tofu["tofu apply<br/>kind cluster + Secret + Helm"]
   Tofu --> API["3 API Pods<br/>Service"]
   API --> DB["PostgreSQL<br/>PVC"]
+  Tofu --> Monitor["Prometheus + Grafana<br/>saved dashboard"]
+  Monitor --> API
 ```
 
 Every repository change reaches protected `main` through a pull request after the required checks pass. A `v1.x.y` tag starts `release.yml`, which builds the API image for `linux/amd64` and `linux/arm64`, publishes it to GHCR and creates the GitHub Release. The Helm chart references that exact release tag rather than `latest`. OpenTofu creates the kind cluster, Namespace, generated database Secret and Helm release; PostgreSQL stores its data on a PVC.
@@ -120,6 +163,7 @@ Every repository change reaches protected `main` through a pull request after th
 | `k8s/` | Plain Kubernetes manifests retained for Missions 7–8 and their checks |
 | `charts/course-app/` | Helm chart for three API replicas and PostgreSQL with probes, resources, ConfigMap, Secret reference and PVC |
 | `infra/` | OpenTofu configuration for the kind cluster, Namespace, generated Secret and Helm release |
+| `observability/dashboard.json` | Importable Grafana dashboard for ready Pods, restarts, CPU and memory in the `course` namespace |
 | `lab1/` … `lab10/` | My lab write-ups and evidence |
 | `capstone/README.md` | This tested runbook and capstone evidence |
 
@@ -127,7 +171,7 @@ I used the standard course application and assignment materials. My Mission 7–
 
 ## Level and evidence
 
-I currently claim **Target without T3**: Minimum (M1–M7), T1 (Infrastructure as code) and T2 (Security gates). T3 is listed honestly under `## Known issues` and is not claimed.
+I currently claim **Target**: Minimum (M1–M7), T1 (Infrastructure as code), T2 (Security gates) and T3 (Observability).
 
 | Item | Evidence |
 |------|----------|
@@ -143,6 +187,7 @@ I currently claim **Target without T3**: Minimum (M1–M7), T1 (Infrastructure a
 | T2 · Trivy | [`ci.yml`, scan before push](https://github.com/sachidumaleesha/turiba-devops-labs/blob/main/.github/workflows/ci.yml) · [PR #43](https://github.com/sachidumaleesha/turiba-devops-labs/pull/43) · [green `main` run](https://github.com/sachidumaleesha/turiba-devops-labs/actions/runs/45987469783) |
 | T2 · Dependabot | [`.github/dependabot.yml`](https://github.com/sachidumaleesha/turiba-devops-labs/blob/main/.github/dependabot.yml) · [configuration PR #44](https://github.com/sachidumaleesha/turiba-devops-labs/pull/44) · [Dependabot PR #45 closed with the reason](https://github.com/sachidumaleesha/turiba-devops-labs/pull/45) |
 | T2 · SHA pins | [`ci.yml`](https://github.com/sachidumaleesha/turiba-devops-labs/blob/main/.github/workflows/ci.yml) and [`release.yml`](https://github.com/sachidumaleesha/turiba-devops-labs/blob/main/.github/workflows/release.yml) · [PR #49](https://github.com/sachidumaleesha/turiba-devops-labs/pull/49) · [green `main` run](https://github.com/sachidumaleesha/turiba-devops-labs/actions/runs/46043383966) |
+| T3 · Observability | [`observability/dashboard.json`](https://github.com/sachidumaleesha/turiba-devops-labs/blob/main/observability/dashboard.json) · [`capstone/dashboard.png`](https://github.com/sachidumaleesha/turiba-devops-labs/blob/main/capstone/dashboard.png) · tested kube-prometheus-stack 94.2.0 install and live metrics on 27 Nov 2026 |
 
 ## When it breaks
 
@@ -156,10 +201,9 @@ For a general first look I use `kubectl -n course get pods`, then `kubectl -n co
 
 ## Known issues
 
-- **T3 is not implemented yet.** kube-prometheus-stack, `observability/dashboard.json` and the Grafana screenshot are not present.
 - On this Windows laptop, WSL's Docker credential helper could not perform the first kind image pull. Pulling the exact image once through Windows Docker made the subsequent OpenTofu build and rebuild pass.
 - The web front end runs only under Compose. The capstone makes the front end optional on Kubernetes; the cluster intentionally runs the API and PostgreSQL only.
 
 ## AI use
 
-I used OpenAI Codex to audit the fork against the capstone brief, help restore retained mission files, verify CI and release evidence, run the fresh-clone Compose/OpenTofu tests, and draft this write-up from the observed results. I reviewed the commands and outputs, and I will rehearse and explain the repository flow myself for the exam.
+I used OpenAI Codex to audit the fork against the capstone brief, help restore retained mission files, verify CI and release evidence, run the fresh-clone Compose/OpenTofu tests, build and validate the Grafana dashboard, and draft this write-up from the observed results. I reviewed the commands and outputs, and I will rehearse and explain the repository flow myself for the exam.
